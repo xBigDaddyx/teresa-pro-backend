@@ -1,0 +1,23 @@
+<?php
+
+namespace {{namespace}};
+
+use App\Infrastructure\Repositories\{{class}}Repository;
+
+class {{class}}
+{
+    private $repository;
+
+    public function __construct({{class}}Repository $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    public function execute($data): void
+    {
+        $entity = $this->repository->find($data['id']);
+        if ($entity) {
+            // Contoh operasi
+        }
+    }
+}

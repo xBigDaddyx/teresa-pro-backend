@@ -1,0 +1,31 @@
+<?php
+
+namespace {{namespace}};
+
+use App\Domain\{{context}}\Entities\{{class}}Item;
+
+class {{class}}
+{
+    private $id;
+    private $items = [];
+
+    public function __construct($id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function addItem({{class}}Item $item): void
+    {
+        $this->items[] = $item;
+    }
+
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+}
