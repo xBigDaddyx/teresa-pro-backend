@@ -5,8 +5,32 @@ namespace App\Domain\Accuracy\Validation\Strategies;
 use App\Domain\Accuracy\CartonBox\Entities\CartonBox;
 use App\Domain\Accuracy\Validation\Entities\Item;
 
+/**
+ * Strategi validasi untuk carton box dengan tipe RATIO.
+ *
+ * Kelas ini mengimplementasikan ValidationStrategy untuk memvalidasi item
+ * terhadap aturan RATIO pada carton box, memastikan setiap kombinasi atribut
+ * memenuhi jumlah yang ditentukan dalam rasio.
+ */
+
 class RatioValidationStrategy implements ValidationStrategy
 {
+    /**
+     * Memvalidasi item terhadap aturan RATIO pada carton box.
+     *
+     * Metode ini memeriksa apakah item sesuai dengan salah satu kombinasi atribut
+     * yang didefinisikan dalam aturan RATIO carton box dan memastikan kuantitas item
+     * tidak melebihi rasio yang ditentukan.
+     *
+     * @param CartonBox $carton Carton box yang berisi aturan RATIO
+     * @param Item $item Item yang akan divalidasi
+     *
+     * @throws \Exception Ketika atribut item tidak cocok dengan kombinasi yang didefinisikan dalam RATIO
+     * @throws \Exception Ketika kuantitas item melebihi jumlah yang ditentukan dalam rasio
+     *
+     * @return void
+     */
+
     public function validate(CartonBox $carton, Item $item): void
     {
         $cartonDetails = $this->getAttributes($carton);
@@ -44,9 +68,19 @@ class RatioValidationStrategy implements ValidationStrategy
         }
     }
 
+    /**
+     * Mengambil atribut RATIO dari carton box.
+     *
+     * Metode ini mengekstrak detail packing list carton box dan memproses
+     * data JSON jika diperlukan untuk mendapatkan aturan RATIO.
+     *
+     * @param CartonBox $carton Carton box yang berisi aturan RATIO
+     *
+     * @return array Array yang berisi aturan RATIO dari carton box
+     */
+
     public function getAttributes(CartonBox $carton): array
     {
-        $details = $carton->getPackingList()?->getDetails() ?? [];
-        return is_string($details) ? json_decode($details, true) ?? [] : $details;
+        return $carton->getPackingList()?->getDetails() ?? [];
     }
 }
