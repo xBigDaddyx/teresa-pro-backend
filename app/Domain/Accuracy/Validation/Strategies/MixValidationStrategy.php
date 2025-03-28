@@ -4,9 +4,34 @@ namespace App\Domain\Accuracy\Validation\Strategies;
 
 use App\Domain\Accuracy\CartonBox\Entities\CartonBox;
 use App\Domain\Accuracy\Validation\Entities\Item;
+use Illuminate\Support\Facades\Log;
+
+/**
+ * Strategi validasi untuk carton box dengan tipe MIX.
+ *
+ * Kelas ini mengimplementasikan ValidationStrategy untuk memvalidasi item
+ * terhadap aturan MIX pada carton box, termasuk pencocokan atribut dan
+ * batasan kuantitas.
+ */
 
 class MixValidationStrategy implements ValidationStrategy
 {
+    /**
+     * Memvalidasi item terhadap aturan MIX pada carton box.
+     *
+     * Metode ini memeriksa apakah item sesuai dengan salah satu kombinasi atribut
+     * yang diizinkan dalam aturan MIX carton box dan memastikan kuantitas item
+     * tidak melebihi batas yang ditentukan.
+     *
+     * @param CartonBox $carton Carton box yang berisi aturan MIX
+     * @param Item $item Item yang akan divalidasi
+     *
+     * @throws \Exception Ketika atribut item tidak cocok dengan kombinasi yang diizinkan
+     * @throws \Exception Ketika kuantitas item melebihi batas yang ditentukan
+     *
+     * @return void
+     */
+
     public function validate(CartonBox $carton, Item $item): void
     {
         $cartonAttributes = $this->getAttributes($carton);
@@ -51,9 +76,19 @@ class MixValidationStrategy implements ValidationStrategy
         }
     }
 
+    /**
+     * Mengambil atribut MIX dari carton box.
+     *
+     * Metode ini mengekstrak detail packing list carton box dan memproses
+     * data JSON jika diperlukan untuk mendapatkan atribut MIX.
+     *
+     * @param CartonBox $carton Carton box yang berisi aturan MIX
+     *
+     * @return array Array yang berisi atribut MIX dari carton box
+     */
+
     public function getAttributes(CartonBox $carton): array
     {
-        $details = $carton->getPackingList()?->getDetails() ?? [];
-        return is_string($details) ? json_decode($details, true) ?? [] : $details;
+        return $carton->getPackingList()?->getDetails() ?? [];
     }
 }
