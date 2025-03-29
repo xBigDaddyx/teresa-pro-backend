@@ -17,8 +17,8 @@ jobs:
         image: postgres:17  # Ganti versi sesuai kebutuhan
         env:
           POSTGRES_DB: teresa_test
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: password
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
         options: --health-cmd="pg_isready -U user" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -45,8 +45,8 @@ jobs:
           echo "DB_HOST=127.0.0.1" >> .env
           echo "DB_PORT=5432" >> .env
           echo "DB_DATABASE=laravel_test" >> .env
-          echo "DB_USERNAME=user" >> .env
-          echo "DB_PASSWORD=password" >> .env
+          echo "DB_USERNAME=postgres" >> .env
+          echo "DB_PASSWORD=postgres" >> .env
 
       - name: Generate application key
         run: php artisan key:generate
