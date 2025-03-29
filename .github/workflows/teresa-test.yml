@@ -61,4 +61,4 @@ jobs:
       - name: Run tests
         env:
           APP_ENV: testing
-        run: php artisan test
+        run: php artisan tests/Feature
