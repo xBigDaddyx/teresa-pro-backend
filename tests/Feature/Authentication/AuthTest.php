@@ -21,7 +21,6 @@ describe('AuthController', function () {
                 'password_confirmation' => 'Password123',
             ], ['X-Tenant-ID' => 'solo']); // Tambahkan header
 
-            dump($response->json()); // Debugging
             $response
                 ->assertStatus(200)
                 ->assertJson(fn (AssertableJson $json) =>
@@ -42,7 +41,6 @@ describe('AuthController', function () {
                 'password_confirmation' => 'different',
             ], ['X-Tenant-ID' => 'solo']); // Tambahkan header
 
-            dump($response->json()); // Debugging
             $response
                 ->assertStatus(422)
                 ->assertJson(fn (AssertableJson $json) =>
@@ -67,7 +65,6 @@ describe('AuthController', function () {
                 'password' => 'Password123',
             ], ['X-Tenant-ID' => 'solo']); // Tambahkan header
 
-            dump($response->json()); // Debugging
             $response
                 ->assertStatus(200)
                 ->assertJson(fn (AssertableJson $json) =>
@@ -90,7 +87,6 @@ describe('AuthController', function () {
                 'password' => 'wrongpassword',
             ], ['X-Tenant-ID' => 'solo']); // Tambahkan header
 
-            dump($response->json()); // Debugging
             $response
                 ->assertStatus(401)
                 ->assertJson(fn (AssertableJson $json) =>
@@ -112,7 +108,6 @@ describe('AuthController', function () {
                 'password' => 'Password123',
             ], ['X-Tenant-ID' => 'solo']); // Tambahkan header
 
-            dump($response->json()); // Debugging
             $response
                 ->assertStatus(401)
                 ->assertJson(fn (AssertableJson $json) =>
@@ -130,7 +125,6 @@ describe('AuthController', function () {
 
             $response = $this->postJson('/api/v1/logout', [], ['X-Tenant-ID' => 'solo']); // Tambahkan header
 
-            dump($response->json()); // Debugging
             $response
                 ->assertStatus(200)
                 ->assertJson(fn (AssertableJson $json) =>
@@ -158,7 +152,6 @@ describe('AuthController', function () {
 
             $response = $this->postJson('/api/v1/refresh', [], ['X-Tenant-ID' => 'solo']); // Tambahkan header
 
-            dump($response->json()); // Debugging
             $response
                 ->assertStatus(200)
                 ->assertJson(fn (AssertableJson $json) =>
