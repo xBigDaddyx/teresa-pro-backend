@@ -9,4 +9,5 @@ Route::prefix('v1')->group(function () {
     Route::post('/carton-boxes/{id}/process', [CartonBoxController::class, 'process']);
     Route::get('/carton-boxes/po', [CartonBoxController::class, 'getPOs']);
     Route::get('/carton-boxes/sku', [CartonBoxController::class, 'getSKUs']);
+    Route::post('/carton-boxes/{id}/validate-item', [CartonBoxController::class, 'validateItem']);
 });
