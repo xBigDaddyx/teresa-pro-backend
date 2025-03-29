@@ -23,7 +23,6 @@ Teresa Pro menerapkan **Domain-Driven Design (DDD)** untuk menjaga modularitas d
 - **Laravel 12** (Backend API)
 - **PostgreSQL** (Database Multi-Tenancy)
 - **Redis** (Caching & Queue Management)
-- **Filament v3** (Admin Panel)
 - **Laravel Reverb & Horizon** (Real-Time Processing)
 - **Docker** (Deployment & Pengembangan)
 
