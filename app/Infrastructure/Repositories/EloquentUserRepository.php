@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\Repositories;
 
-use App\Domain\Accuracy\Shared\Repositories\UserRepository;
+use App\Domain\Repositories\UserRepository;
 use App\Models\User;
 
 class EloquentUserRepository implements UserRepository

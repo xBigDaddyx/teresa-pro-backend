@@ -10,22 +10,23 @@ class TenantDatabaseSwitcher
 {
     public function handle(Request $request, Closure $next)
     {
-        $tenant = TenantManager::getCurrent();
-        if ($tenant) {
-            config(['database.connections.tenant' => [
-                'driver' => 'pgsql', // Ubah ke PostgreSQL
-                'host' => env('DB_HOST', '127.0.0.1'),
-                'port' => env('DB_PORT', '5432'), // Port default PostgreSQL
-                'database' => $tenant['database'],
-                'username' => env('DB_USERNAME', 'postgres'),
-                'password' => env('DB_PASSWORD', ''),
-                'charset' => 'utf8',
-                'schema' => 'public', // Skema default PostgreSQL
-                'sslmode' => env('DB_SSLMODE', 'prefer'), // Opsional untuk SSL
-            ]]);
-            DB::setDefaultConnection('tenant');
+        $tenantId = $request->header('X-Tenant-ID');
+        if ($tenantId) {
+            $tenant = TenantManager::resolve($tenantId);
+            TenantManager::setCurrent($tenant);
+            if ($tenant) {
+                config(['database.connections.tenant' => [
+                    'driver' => 'pgsql',
+                    'host' => env('DB_HOST', '127.0.0.1'),
+                    'port' => env('DB_PORT', '5432'),
+                    'database' => $tenant['database'],
+                    'username' => env('DB_USERNAME', 'postgres'),
+                    'password' => env('DB_PASSWORD', 'C@rtini#5'),
+                ]]);
+                DB::setDefaultConnection('tenant');
+                DB::reconnect('tenant');
+            }
         }
-
         return $next($request);
     }
 }
