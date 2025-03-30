@@ -1,6 +1,5 @@
 # Teresa Pro - Laravel 12 API
 
-![Tests](https://github.com/xBigDaddyx/teresa-pro-backend/actions/workflows/teresa-test.yml/badge.svg)
 ![Tests](https://github.com/xBigDaddyx/teresa-pro-backend/actions/workflows/auth-test.yml/badge.svg)
 
 ## 🚀 Tentang Teresa Pro
