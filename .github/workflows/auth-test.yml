@@ -3,10 +3,10 @@ name: Run AuthTest
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   test:
@@ -38,7 +38,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # Adjust to match your Laravel app's PHP version
+          php-version: '8.4'
           extensions: pgsql, pdo_pgsql
           tools: composer
 
@@ -85,3 +85,14 @@ jobs:
           DB_USERNAME: postgres
           DB_PASSWORD: C@rtini#5
         run: ./vendor/bin/pest tests/Feature/Authentication/AuthTest.php
+
+      # Upload test logs and screenshots as artifacts if tests fail
+      - name: Upload test artifacts
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-artifacts
+          path: |
+            storage/logs/*.log
+            tests/screenshots/*
+          retention-days: 7
