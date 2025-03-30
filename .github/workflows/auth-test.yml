@@ -88,7 +88,6 @@ jobs:
 
       # Upload test logs and screenshots as artifacts if tests fail
       - name: Upload test artifacts
-        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: test-artifacts
