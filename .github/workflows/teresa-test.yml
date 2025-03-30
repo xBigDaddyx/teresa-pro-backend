@@ -3,10 +3,10 @@ name: Teresa Test with PostgreSQL
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   test:
@@ -14,45 +14,51 @@ jobs:
 
     services:
       postgres:
-        image: postgres:17  # Ganti versi sesuai kebutuhan
+        image: postgres:17
         env:
           POSTGRES_DB: teresa_test
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: password
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: C@rtini#5  # Sesuaikan dengan password lokal Anda
         ports:
           - 5432:5432
-        options: --health-cmd="pg_isready -U user" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: --health-cmd="pg_isready -U postgres" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4  # Update ke versi terbaru
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'  # Sesuaikan dengan versi PHP Anda
+          php-version: '8.4'
           extensions: mbstring, xml, ctype, json, tokenizer, pgsql, pdo_pgsql
 
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-progress
+        run: composer install --prefer-dist --no-progress --no-interaction
 
       - name: Copy .env file
         run: cp .env.example .env
 
       - name: Configure .env for testing
         run: |
+          echo "APP_ENV=testing" >> .env
+          echo "APP_KEY=base64:4X4jCpT3ylSgiWNjGj4hz3NmaReihuad+sYGPfbAH74=" >> .env
           echo "DB_CONNECTION=pgsql" >> .env
           echo "DB_HOST=127.0.0.1" >> .env
           echo "DB_PORT=5432" >> .env
-          echo "DB_DATABASE=laravel_test" >> .env
-          echo "DB_USERNAME=user" >> .env
-          echo "DB_PASSWORD=password" >> .env
+          echo "DB_DATABASE=teresa_test" >> .env  # Sesuaikan dengan nama DB di service
+          echo "DB_USERNAME=postgres" >> .env
+          echo "DB_PASSWORD=C@rtini#5" >> .env    # Sesuaikan dengan password lokal
 
       - name: Generate application key
         run: php artisan key:generate
 
       - name: Run migrations
-        run: php artisan migrate --env=testing
+        env:
+          APP_ENV: testing
+        run: php artisan migrate --force
 
       - name: Run tests
-        run: php artisan test
+        env:
+          APP_ENV: testing
+        run: ./vendor/bin/pest tests/Feature

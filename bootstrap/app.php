@@ -13,6 +13,7 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
+        web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
@@ -23,7 +24,6 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Infrastructure\Tenancy\TenantIdentifier::class,
             \App\Infrastructure\Tenancy\TenantDatabaseSwitcher::class,
         ]);
-
 
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -52,6 +52,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 return ApiResponse::error('An unexpected error occurred: ' . $e->getMessage(), null, 500);
             }
 
-            return null; // Return null for non-API requests to let Laravel handle the exception normally
+//            return null; // Return null for non-API requests to let Laravel handle the exception normally
         });
     })->create();
