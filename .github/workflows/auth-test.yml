@@ -1,0 +1,87 @@
+name: Run AuthTest
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # Define services (PostgreSQL)
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: C@rtini#5
+          POSTGRES_DB: tenant_solo_test
+        ports:
+          - 5432:5432
+        # Ensure PostgreSQL is ready
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up PHP
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2' # Adjust to match your Laravel app's PHP version
+          extensions: pgsql, pdo_pgsql
+          tools: composer
+
+      # Install Composer dependencies
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress
+
+      # Copy .env.example to .env
+      - name: Create .env file
+        run: cp .env.example .env
+
+      # Generate application key
+      - name: Generate application key
+        run: php artisan key:generate
+
+      # Update .env with test database settings
+      - name: Configure environment
+        run: |
+          sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=pgsql/' .env
+          sed -i 's/DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          sed -i 's/DB_PORT=.*/DB_PORT=5432/' .env
+          sed -i 's/DB_DATABASE=.*/DB_DATABASE=tenant_solo_test/' .env
+          sed -i 's/DB_USERNAME=.*/DB_USERNAME=postgres/' .env
+          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=C@rtini#5/' .env
+
+      # Run migrations on the tenant database
+      - name: Run migrations
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: tenant_solo_test
+          DB_USERNAME: postgres
+          DB_PASSWORD: C@rtini#5
+        run: php artisan migrate:fresh --database=tenant
+
+      # Run AuthTest with Pest
+      - name: Run AuthTest
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: tenant_solo_test
+          DB_USERNAME: postgres
+          DB_PASSWORD: C@rtini#5
+        run: ./vendor/bin/pest tests/Feature/Authentication/AuthTest.php
