@@ -1,6 +1,7 @@
 # Teresa Pro - Laravel 12 API
 
 ![Tests](https://github.com/xBigDaddyx/teresa-pro-backend/actions/workflows/teresa-test.yml/badge.svg)
+![Tests](https://github.com/xBigDaddyx/teresa-pro-backend/actions/workflows/auth-test.yml/badge.svg)
 
 ## 🚀 Tentang Teresa Pro
 **Teresa Pro** adalah API berbasis **Laravel 12** yang dirancang untuk memberikan solusi manajemen data yang cepat, aman, dan scalable. Dengan arsitektur **DDD (Domain-Driven Design)**, proyek ini mengadopsi pendekatan **multi-tenancy** dan berbasis event-driven menggunakan **Laravel Reverb** serta **Redis** untuk kinerja optimal.
