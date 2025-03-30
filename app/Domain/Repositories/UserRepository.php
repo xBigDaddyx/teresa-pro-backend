@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Accuracy\Shared\Repositories;
+namespace App\Domain\Repositories;
 
 interface UserRepository
 {

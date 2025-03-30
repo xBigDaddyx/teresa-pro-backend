@@ -12,6 +12,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
+        Route::post('/refresh', [AuthController::class, 'refresh']);
         Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
             $user = \App\Models\User::findOrFail($id);
             if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
@@ -27,7 +28,7 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
-        Route::post('/refresh', [AuthController::class, 'refresh']);
+
         Route::get('/user', function (Request $request) {
             return $request->user();
         });

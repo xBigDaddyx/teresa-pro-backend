@@ -4,9 +4,12 @@ namespace App\Application\Http\Controllers\V1;
 
 use App\Application\Http\Controllers\BaseController;
 use App\Application\Services\AuthService;
+use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
+use App\Infrastructure\Tenancy\TenantManager;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rules\Password;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends BaseController
 {
@@ -17,14 +20,13 @@ class AuthController extends BaseController
         $this->authService = $authService;
     }
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
         try {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email',
-                'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()->mixedCase()],
-            ]);
+            $tenant = TenantManager::getCurrent();
+            if (!$tenant) {
+                return $this->errorResponse('Tenant not found', null, 403);
+            }
 
             $token = $this->authService->register(
                 $request->input('name'),
@@ -32,30 +34,23 @@ class AuthController extends BaseController
                 $request->input('password')
             );
 
-            if (!$token) {
-                return $this->errorResponse('Failed to generate token', 500);
-            }
-
             return $this->successResponse(
-                ['token' => $token], // $data
-                'User registered successfully. Please verify your email.', // $message
-                [], // $meta
-                200 // $statusCode
+                ['token' => $token],
+                'User registered successfully. Please verify your email.'
             );
-        } catch (ValidationException $e) {
-            throw $e;
         } catch (\Exception $e) {
-            return $this->errorResponse('Registration failed: ' . $e->getMessage(), 500);
+            Log::error('Registration failed', ['error' => $e->getMessage(), 'email' => $request->input('email')]);
+            return $this->errorResponse('Registration failed: ' . $e->getMessage(), null, 500);
         }
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
         try {
-            $request->validate([
-                'email' => 'required|email',
-                'password' => 'required',
-            ]);
+            $tenant = TenantManager::getCurrent();
+            if (!$tenant) {
+                return $this->errorResponse('Tenant not found', null, 403);
+            }
 
             $token = $this->authService->login(
                 $request->input('email'),
@@ -64,18 +59,15 @@ class AuthController extends BaseController
 
             if ($token) {
                 return $this->successResponse(
-                    ['token' => $token], // $data
-                    'Login successful', // $message
-                    [], // $meta
-                    200 // $statusCode
+                    ['token' => $token],
+                    'Login successful'
                 );
             }
 
-            return $this->errorResponse('Invalid credentials or email not verified', 401);
-        } catch (ValidationException $e) {
-            throw $e;
+            return $this->errorResponse('Invalid credentials or email not verified', null, 401);
         } catch (\Exception $e) {
-            return $this->errorResponse('Login failed: ' . $e->getMessage(), 500);
+            Log::error('Login error', ['error' => $e->getMessage(), 'email' => $request->input('email')]);
+            return $this->errorResponse('Login failed: ' . $e->getMessage(), null, 500);
         }
     }
 
@@ -84,43 +76,37 @@ class AuthController extends BaseController
         try {
             $user = $request->user();
             if (!$user) {
-                return $this->errorResponse('User not authenticated', 401);
+                return $this->errorResponse('User not authenticated', null, 401);
             }
 
             $this->authService->logout($user);
-            return $this->successResponse(
-                null, // $data
-                'Logged out successfully', // $message
-                [], // $meta
-                200 // $statusCode
-            );
+            return $this->successResponse(null, 'Logged out successfully');
         } catch (\Exception $e) {
-            return $this->errorResponse('Logout failed: ' . $e->getMessage(), 500);
+            Log::error('Logout failed', ['error' => $e->getMessage()]);
+            return $this->errorResponse('Logout failed: ' . $e->getMessage(), null, 500);
         }
     }
 
     public function refresh(Request $request)
     {
         try {
-            $user = $request->user();
-            if (!$user) {
-                return $this->errorResponse('User not authenticated', 401);
+            $currentRefreshToken = $request->bearerToken();
+            if (!$currentRefreshToken) {
+                return $this->errorResponse('Unauthenticated - Refresh token is required', null, 401);
             }
 
-            $token = $this->authService->refreshToken($user);
-
-            if (!$token) {
-                return $this->errorResponse('Failed to refresh token', 500);
-            }
+            $tokens = $this->authService->refreshToken($currentRefreshToken);
 
             return $this->successResponse(
-                ['token' => $token], // $data
-                'Token refreshed successfully', // $message
-                [], // $meta
-                200 // $statusCode
+                ['token' => $tokens['access_token'], 'refresh_token' => $tokens['refresh_token']],
+                'Token refreshed successfully'
             );
         } catch (\Exception $e) {
-            return $this->errorResponse('Token refresh failed: ' . $e->getMessage(), 500);
+            if ($e->getMessage() === 'Invalid or expired refresh token') {
+                return $this->errorResponse('Invalid refresh token', null, 401);
+            }
+            Log::error('Refresh failed', ['error' => $e->getMessage()]);
+            return $this->errorResponse('Token refresh failed: ' . $e->getMessage(), null, 500);
         }
     }
 }

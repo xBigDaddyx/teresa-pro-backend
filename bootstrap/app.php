@@ -25,13 +25,6 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Infrastructure\Tenancy\TenantDatabaseSwitcher::class,
         ]);
 
-//        RateLimiter::for('login', function (Request $request) {
-//            return Limit::perMinute(5)->by($request->input('email') ?: $request->ip());
-//        });
-//
-//        RateLimiter::for('api', function (Request $request) {
-//            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
-//        });
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->renderable(function (Throwable $e, Request $request) {
