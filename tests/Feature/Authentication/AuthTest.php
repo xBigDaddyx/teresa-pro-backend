@@ -47,7 +47,7 @@ describe('AuthController', function () {
             ], ['X-Tenant-ID' => 'solo']);
 
             $response
-                ->assertStatus(200)
+                ->assertStatus(201)
                 ->assertJson(fn (AssertableJson $json) =>
                 $json->where('status', 'success')
                     ->where('message', 'User registered successfully. Please verify your email.')

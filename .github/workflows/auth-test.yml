@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  test:
+  auth-test:
     runs-on: ubuntu-latest
 
     # Define services (PostgreSQL)
